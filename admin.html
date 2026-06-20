@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin — ጄሪ ኢቨንት</title>
+  <style>
+    :root{--burg:#4A1228;--burg2:#6B1E3A;--gold:#C9932A;--goldf:#F0C060;--ivory:#FAF6F0;--white:#fff;--gray:#6B6258;--border:#E8DDD4;--green:#2E7D32;--red:#C62828;--blue:#1565C0;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI','Noto Sans Ethiopic',sans-serif;background:#f0ece8;color:#1C1008;}
+    /* SIDEBAR */
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--burg);color:white;display:flex;flex-direction:column;}
+    .sidebar-brand{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,.1);}
+    .sidebar-brand h2{font-size:1rem;font-weight:900;color:var(--goldf);}
+    .sidebar-brand p{font-size:.72rem;color:#d4a8b8;margin-top:.2rem;}
+    .sidebar-nav{flex:1;padding:1rem 0;}
+    .nav-item{display:flex;align-items:center;gap:.8rem;padding:.75rem 1.5rem;cursor:pointer;transition:background .2s;font-size:.88rem;font-weight:600;color:#e0c8d0;}
+    .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.1);color:var(--goldf);}
+    .nav-item .icon{font-size:1.1rem;width:20px;}
+    .sidebar-footer{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,.1);font-size:.75rem;color:#b8909c;}
+    /* MAIN */
+    .main{margin-left:230px;min-height:100vh;}
+    .topbar{background:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.08);position:sticky;top:0;z-index:10;}
+    .topbar h1{font-size:1.1rem;font-weight:800;}
+    .topbar-right{display:flex;align-items:center;gap:.8rem;}
+    .badge-live{background:#e8f5e9;color:var(--green);padding:.25rem .7rem;border-radius:20px;font-size:.75rem;font-weight:700;}
+    .content{padding:2rem;}
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+    .stat-card{background:white;border-radius:10px;padding:1.3rem;box-shadow:0 1px 6px rgba(0,0,0,.07);border-left:4px solid var(--gold);}
+    .stat-card.pending{border-color:#FF8F00;}
+    .stat-card.confirmed{border-color:var(--green);}
+    .stat-card.cancelled{border-color:var(--red);}
+    .stat-num{font-size:2rem;font-weight:900;color:var(--burg);}
+    .stat-label{font-size:.8rem;color:var(--gray);margin-top:.2rem;}
+    /* TABLE */
+    .table-card{background:white;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;}
+    .table-header{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);}
+    .table-header h3{font-size:1rem;font-weight:800;}
+    .search-input{padding:.5rem .9rem;border:2px solid var(--border);border-radius:8px;font-size:.85rem;width:220px;outline:none;}
+    .search-input:focus{border-color:var(--gold);}
+    table{width:100%;border-collapse:collapse;}
+    th{padding:.75rem 1rem;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray);background:#faf8f5;border-bottom:2px solid var(--border);}
+    td{padding:.85rem 1rem;font-size:.85rem;border-bottom:1px solid #f0ece8;vertical-align:middle;}
+    tr:hover td{background:#fdf9f5;}
+    /* STATUS BADGES */
+    .status-badge{display:inline-block;padding:.25rem .7rem;border-radius:20px;font-size:.72rem;font-weight:700;}
+    .status-pending{background:#FFF3E0;color:#E65100;}
+    .status-confirmed{background:#E8F5E9;color:#1B5E20;}
+    .status-cancelled{background:#FFEBEE;color:#B71C1C;}
+    /* BUTTONS */
+    .btn{padding:.4rem .9rem;border-radius:6px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;transition:all .2s;}
+    .btn-confirm{background:#E8F5E9;color:var(--green);}
+    .btn-confirm:hover{background:var(--green);color:white;}
+    .btn-cancel{background:#FFEBEE;color:var(--red);}
+    .btn-cancel:hover{background:var(--red);color:white;}
+    .btn-delete{background:#f5f5f5;color:#666;}
+    .btn-delete:hover{background:#666;color:white;}
+    .btn-refresh{background:var(--gold);color:var(--burg);padding:.5rem 1rem;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.85rem;}
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:4rem 1rem;color:var(--gray);}
+    .empty-state .icon{font-size:3rem;margin-bottom:1rem;}
+    /* TOAST */
+    .toast{position:fixed;bottom:2rem;right:2rem;background:#1C1008;color:white;padding:.8rem 1.5rem;border-radius:10px;font-size:.88rem;font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;border-left:4px solid var(--gold);}
+    .toast.show{transform:translateY(0);opacity:1;}
+    /* LOADING */
+    .loading{text-align:center;padding:3rem;color:var(--gray);}
+    @media(max-width:900px){
+      .sidebar{width:60px;}
+      .sidebar-brand p,.nav-item span,.sidebar-footer{display:none;}
+      .sidebar-brand h2{font-size:.7rem;}
+      .main{margin-left:60px;}
+      .stats-row{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <h2>ጄሪ ኢቨንት</h2>
+    <p>Admin Dashboard</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showTab('bookings')">
+      <span class="icon">📋</span><span>ቦታ ማስያዝ</span>
+    </div>
+    <div class="nav-item" onclick="showTab('contacts')">
+      <span class="icon">📩</span><span>መልዕክቶች</span>
+    </div>
+    <div class="nav-item" onclick="window.open('/', '_blank')">
+      <span class="icon">🌐</span><span>ድህረ ገጽ</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    Jerry Event Organizers<br/>ሆሳዕና, ኢትዮጵያ
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <h1 id="page-title">📋 የቦታ ማስያዝ ዝርዝር</h1>
+    <div class="topbar-right">
+      <span class="badge-live">🟢 Live</span>
+      <button class="btn-refresh" onclick="loadAll()">↻ አድስ</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="stat-num" id="s-total">–</div><div class="stat-label">ጠቅላላ ቦታ ማስያዝ</div></div>
+      <div class="stat-card pending"><div class="stat-num" id="s-pending">–</div><div class="stat-label">በመጠባበቅ ላይ</div></div>
+      <div class="stat-card confirmed"><div class="stat-num" id="s-confirmed">–</div><div class="stat-label">የተረጋገጠ</div></div>
+      <div class="stat-card cancelled"><div class="stat-num" id="s-cancelled">–</div><div class="stat-label">የተሰረዘ</div></div>
+    </div>
+
+    <!-- BOOKINGS TABLE -->
+    <div class="table-card" id="tab-bookings">
+      <div class="table-header">
+        <h3>ሁሉም ቦታ ማስያዝ</h3>
+        <input type="text" class="search-input" placeholder="🔍 ፈልግ..." id="search-box" oninput="filterBookings()"/>
+      </div>
+      <div id="bookings-table-wrap">
+        <div class="loading">⏳ ዳታ እየጫናል...</div>
+      </div>
+    </div>
+
+    <!-- CONTACTS TABLE -->
+    <div class="table-card" id="tab-contacts" style="display:none; margin-top:1.5rem;">
+      <div class="table-header"><h3>📩 ተቀባይ መልዕክቶች</h3></div>
+      <div id="contacts-table-wrap"><div class="loading">⏳ ዳታ እየጫናል...</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allBookings = [];
+
+// ---- TABS ----
+function showTab(tab) {
+  document.getElementById('tab-bookings').style.display = tab === 'bookings' ? 'block' : 'none';
+  document.getElementById('tab-contacts').style.display = tab === 'contacts' ? 'block' : 'none';
+  document.getElementById('page-title').textContent = tab === 'bookings' ? '📋 የቦታ ማስያዝ ዝርዝር' : '📩 ተቀባይ መልዕክቶች';
+  document.querySelectorAll('.nav-item').forEach((el,i) => el.classList.toggle('active', i === (tab==='bookings'?0:1)));
+}
+
+// ---- LOAD DATA ----
+async function loadAll() {
+  await Promise.all([loadStats(), loadBookings(), loadContacts()]);
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch('/api/admin/stats');
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('s-total').textContent     = d.stats.total;
+      document.getElementById('s-pending').textContent   = d.stats.pending;
+      document.getElementById('s-confirmed').textContent = d.stats.confirmed;
+      document.getElementById('s-cancelled').textContent = d.stats.cancelled;
+    }
+  } catch { showToast('❌ ሰርቨር ጋር ለማገናኘት አልተቻለም'); }
+}
+
+async function loadBookings() {
+  try {
+    const r = await fetch('/api/admin/bookings');
+    const d = await r.json();
+    allBookings = d.bookings || [];
+    renderBookings(allBookings);
+  } catch {
+    document.getElementById('bookings-table-wrap').innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>ሰርቨር ጋር መገናኘት አልተቻለም።</p></div>';
+  }
+}
+
+async function loadContacts() {
+  try {
+    const r = await fetch('/api/admin/bookings'); // reuse same endpoint style
+    document.getElementById('contacts-table-wrap').innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>ምንም መልዕክት የለም።</p></div>';
+  } catch {}
+}
+
+function filterBookings() {
+  const q = document.getElementById('search-box').value.toLowerCase();
+  const filtered = allBookings.filter(b =>
+    (b.firstName+' '+b.lastName).toLowerCase().includes(q) ||
+    b.phone.includes(q) ||
+    (b.eventType||'').toLowerCase().includes(q) ||
+    (b.location||'').toLowerCase().includes(q)
+  );
+  renderBookings(filtered);
+}
+
+function renderBookings(bookings) {
+  const wrap = document.getElementById('bookings-table-wrap');
+  if (!bookings.length) {
+    wrap.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>ምንም ቦታ ማስያዝ አልተመዘገበም።</p></div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>#</th><th>ደንበኛ</th><th>ስልክ</th><th>ፕሮግራም</th>
+        <th>ቀን</th><th>ቦታ</th><th>እንግዶች</th><th>ሁኔታ</th><th>ድርጊት</th>
+      </tr></thead>
+      <tbody>
+        ${bookings.map((b, i) => `
+          <tr id="row-${b.id}">
+            <td><b>${i+1}</b></td>
+            <td><b>${b.firstName} ${b.lastName||''}</b><br/><small style="color:#9a7a86">${formatDate(b.createdAt)}</small></td>
+            <td>${b.phone}</td>
+            <td>${b.eventType}</td>
+            <td>${b.eventDate}</td>
+            <td>${b.location||'–'}</td>
+            <td>${b.guests||'–'}</td>
+            <td><span class="status-badge status-${b.status}">${statusLabel(b.status)}</span></td>
+            <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
+              ${b.status!=='confirmed'?`<button class="btn btn-confirm" onclick="updateStatus('${b.id}','confirmed')">✓ አረጋግጥ</button>`:''}
+              ${b.status!=='cancelled'?`<button class="btn btn-cancel" onclick="updateStatus('${b.id}','cancelled')">✕ ሰርዝ</button>`:''}
+              <button class="btn btn-delete" onclick="deleteBooking('${b.id}')">🗑</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ---- ACTIONS ----
+async function updateStatus(id, status) {
+  try {
+    const r = await fetch(`/api/admin/bookings/${id}/status`, {
+      method: 'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status })
+    });
+    const d = await r.json();
+    if (d.success) { showToast(`✅ ሁኔታ ተቀይሯል: ${statusLabel(status)}`); loadAll(); }
+  } catch { showToast('❌ ለውጥ ማድረግ አልተቻለም'); }
+}
+
+async function deleteBooking(id) {
+  if (!confirm('ይህን ቦታ ማስያዝ ለማጥፋት እርግጠኛ ነዎት?')) return;
+  try {
+    await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
+    showToast('🗑 ቦታ ማስያዝ ተሰርዟል');
+    loadAll();
+  } catch { showToast('❌ ለውጥ ማድረግ አልተቻለም'); }
+}
+
+// ---- HELPERS ----
+function statusLabel(s) { return {pending:'⏳ ይጠብቃል', confirmed:'✅ ተረጋግጧል', cancelled:'❌ ተሰርዟል'}[s] || s; }
+function formatDate(iso) { return iso ? new Date(iso).toLocaleDateString('am-ET') : ''; }
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ---- INIT ----
+loadAll();
+setInterval(loadAll, 30000); // Auto-refresh every 30 seconds
+</script>
+</body>
+</html>

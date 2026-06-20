@@ -1,0 +1,4 @@
+node_modules/
+bookings_db.json
+.env
+*.log

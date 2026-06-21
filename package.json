@@ -1,0 +1,20 @@
+{
+  "name": "jerry-event-organizers",
+  "version": "2.0.0",
+  "description": "Jerry Event Organizers — Hossana, Ethiopia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "africastalking": "^0.6.7",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-telegram-bot-api": "^0.64.0",
+    "nodemailer": "^6.10.1",
+    "qrcode": "^1.5.4"
+  }
+}

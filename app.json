@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Jerry Event",
+    "slug": "jerry-event-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4A1228"
+    },
+    "android": {
+      "package": "com.jerryevent.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4A1228"
+      },
+      "permissions": ["INTERNET", "VIBRATE"]
+    },
+    "ios": {
+      "bundleIdentifier": "com.jerryevent.app",
+      "supportsTablet": false
+    }
+  }
+}
